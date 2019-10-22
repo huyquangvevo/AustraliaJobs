@@ -4,6 +4,7 @@ import re
 from nltk.stem.wordnet import WordNetLemmatizer
 
 
+
 client = MongoClient('localhost', 27017) 
 db = client.australia_jobs
 
@@ -17,14 +18,22 @@ dictKw = {}
 #     dictKw[kw["Keyword"]] = 0
 
 ### get keywords from file
-with open('../data/k_plurals.txt','r',encoding='utf-8') as f:
-    s = f.readlines()
-    # print(len(s))
-    s = list(map(lambda  x: x.replace(" \n","\n"),s))
-    s = list(map(lambda  x: x.replace("\n",""),s))
-    for k in s:
-        keywords.append(k)
-        dictKw[k] = 0
+df = pd.read_csv('../data/keyword_label_plurals_2.csv')
+# print(df.shape)
+# exit()
+keywords = df["Keyword"]
+for k in keywords:
+    dictKw[k] = 0
+# print(dictKw)
+# exit()
+# with open('../data/k_plurals.txt','r',encoding='utf-8') as f:
+#     s = f.readlines()
+#     # print(len(s))
+#     s = list(map(lambda  x: x.replace(" \n","\n"),s))
+#     s = list(map(lambda  x: x.replace("\n",""),s))
+#     for k in s:
+#         keywords.append(k)
+#         dictKw[k] = 0
 
 
 ### end kw
@@ -36,7 +45,6 @@ def cleanHTML(raw_html):
     cleantext = re.sub(' +', ' ', cleantext)
     cleantext  = cleantext.replace('&nbsp','')
     cleantext = re.sub("[^a-zA-Z]+", " ",cleantext)
-    # cleantext = cleantext.split(' ')
     return ' ' + cleantext.lower() + ' '
 
 def lemmatize(doc):
@@ -62,7 +70,6 @@ for des in fDs:
         d = lemmatize(d)
         for k in keywords:
             if k.find('and') != -1 :
-                print(k)
                 inDoc = False
                 kl = k.lower()
                 kl = kl.split(' ')
@@ -93,10 +100,6 @@ for des in fDs:
     except:
         print(c)
 
-# print(len(fullD))
-# with open('result_kw.txt','w',encoding='utf-8') as f:
-    # for k,v in dictKw.items():
-        # f.write(k)
 K = []
 V = []
 for k,v in dictKw.items():
@@ -105,5 +108,7 @@ for k,v in dictKw.items():
     print('K: %s - V: %d ' %(k,v))
 
 d = {"Keyword":K,"Value":V}
-df = pd.DataFrame(d)
-df.to_csv('../data/result_kw_plurals_1.csv',index=False,encoding='utf-8')
+dff = pd.DataFrame(d)
+dff.to_csv('../data/result_kw_plurals_3_demo.csv',index=False,encoding='utf-8')
+df['Freq'] = V
+df.to_csv('../data/result_kw_plurals_3.csv',index=False,encoding='utf-8')
