@@ -8,16 +8,24 @@ db = client.australia_jobs
 kws = db.Keywords.find({})
 keywords = []
 dictKw = {}
-for kw in kws:
-    keywords.append(kw["Keyword"])
-    dictKw[kw["Keyword"]] = 0
-    # print(kw["Keyword"])
-# for d,v in dictKw.items():
-    # print(d)
-    # print(v)
-# exit()
-# print(len(keywords))
-# exit()
+### get keywords from database
+# for kw in kws:
+#     keywords.append(kw["Keyword"])
+#     dictKw[kw["Keyword"]] = 0
+
+### get keywords from file
+with open('../data/k_plurals.txt','r',encoding='utf-8') as f:
+    s = f.readlines()
+    # print(len(s))
+    s = list(map(lambda  x: x.replace(" \n","\n"),s))
+    s = list(map(lambda  x: x.replace("\n",""),s))
+    for k in s:
+        keywords.append(k)
+        dictKw[k] = 0
+
+
+### end kw
+
 fDs = db.Jobs.find({})
 def cleanHTML(raw_html):
     cleanr = re.compile('<.*?>')
@@ -40,9 +48,10 @@ for des in fDs:
         d = cleanHTML(d)
         for k in keywords:
             if k.find('and') != -1 :
+                print(k)
                 inDoc = False
                 kl = k.lower()
-                kl = k.split(' ')
+                kl = kl.split(' ')
                 del kl[1]
                 t1 = ' ' + kl[0] + ' '  #' food '
                 t2 = ' ' + kl[1] + ' ' + kl[2] + ' ' #' beverage manager '
@@ -83,4 +92,4 @@ for k,v in dictKw.items():
 
 d = {"Keyword":K,"Value":V}
 df = pd.DataFrame(d)
-df.to_csv('../data/result_kw5.csv',index=False,encoding='utf-8')
+df.to_csv('../data/result_kw_plurals_1.csv',index=False,encoding='utf-8')
