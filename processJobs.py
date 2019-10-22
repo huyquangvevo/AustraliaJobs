@@ -42,7 +42,7 @@ for des in fDs:
             if k.find('and') != -1 :
                 inDoc = False
                 kl = k.lower()
-                kl = k.split(' ')
+                kl = kl.split(' ')
                 del kl[1]
                 t1 = ' ' + kl[0] + ' '  #' food '
                 t2 = ' ' + kl[1] + ' ' + kl[2] + ' ' #' beverage manager '
