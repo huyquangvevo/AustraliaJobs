@@ -1,10 +1,13 @@
 from pymongo import MongoClient
 import pandas as pd
 import re
+from nltk.stem.wordnet import WordNetLemmatizer
+
 
 client = MongoClient('localhost', 27017) 
 db = client.australia_jobs
 
+wordNet = WordNetLemmatizer()
 kws = db.Keywords.find({})
 keywords = []
 dictKw = {}
@@ -36,6 +39,16 @@ def cleanHTML(raw_html):
     # cleantext = cleantext.split(' ')
     return ' ' + cleantext.lower() + ' '
 
+def lemmatize(doc):
+    doc = doc.split(' ')
+    doc = list(map(lambda  x: wordNet.lemmatize(x,pos='n'),doc))
+    doc = ' '.join(doc)
+    return ' ' + doc + ' '
+
+# s = "i have 5 caterings and 3 cats"
+# print(lemmatize(s))
+# exit()
+
 # exit()
 # t = cleanHTML(fDs[0]["FullDescription"])
 # print(t.find(' ' + 'these'+ ' '))
@@ -46,6 +59,7 @@ for des in fDs:
     try:
         d = des["FullDescription"]
         d = cleanHTML(d)
+        d = lemmatize(d)
         for k in keywords:
             if k.find('and') != -1 :
                 print(k)
